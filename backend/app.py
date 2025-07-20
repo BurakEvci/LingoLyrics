@@ -45,8 +45,6 @@ def get_lyrics():
 # Spotify track ID endpoint
 
 
-
-
 @app.route('/spotify', methods=['GET'])
 def get_spotify_track():
     artist = request.args.get('artist')
@@ -58,8 +56,18 @@ def get_spotify_track():
     query = f"{title} {artist}"
     result = sp.search(q=query, type='track', limit=1)
     if result['tracks']['items']:
-        track_id = result['tracks']['items'][0]['id']
-        return jsonify({"track_id": track_id})
+        item = result['tracks']['items'][0]
+        track_info = {
+            "track_id": item['id'],
+            "track_name": item['name'],
+            "artist_name": item['artists'][0]['name'],
+            "album_name": item['album']['name'],
+            "album_image": item['album']['images'][0]['url'],
+            "release_date": item['album']['release_date'],
+            "spotify_url": item['external_urls']['spotify']
+
+        }
+        return jsonify(track_info)
     else:
         return jsonify({"error": "Track not found"}), 404
 

@@ -6,10 +6,30 @@ async function getLyrics() {
   const container = document.getElementById("lyricsContainer");
   container.innerHTML = "";
 
-  // 🎵 Spotify Track ID Al
+  // 🎵 Spotify
   const spotifyRes = await fetch(`http://127.0.0.1:5000/spotify?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
   const spotifyData = await spotifyRes.json();
+
   if (spotifyData.track_id) {
+    // 🎧 Üst bilgi kartı (Kapak + bilgiler)
+    const infoCard = document.createElement("div");
+    infoCard.className = "e-card";
+    infoCard.style.marginBottom = "20px";
+
+    infoCard.innerHTML = `
+      <div class="e-card-header">
+        <img src="${spotifyData.album_image}" alt="Album Cover" style="height: 100px; border-radius: 8px; margin-right: 10px;" />
+        <div class="e-card-header-caption">
+          <div class="e-card-title">${spotifyData.track_name}</div>
+          <div class="e-card-sub-title">${spotifyData.artist_name} • ${spotifyData.album_name} (${spotifyData.release_date})</div>
+        </div>
+      </div>
+      <div class="e-card-content">
+        <a href="${spotifyData.spotify_url}" target="_blank">🔗 Spotify'da Aç</a>
+      </div>
+    `;
+    container.appendChild(infoCard);
+
     const iframe = document.createElement("iframe");
     iframe.src = `https://open.spotify.com/embed/track/${spotifyData.track_id}`;
     iframe.width = "100%";
@@ -17,10 +37,11 @@ async function getLyrics() {
     iframe.frameBorder = "0";
     iframe.allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture";
     iframe.allowFullscreen = true;
+    iframe.style.borderRadius = "10px";
     container.appendChild(iframe);
   }
 
-  // 🎤 Şarkı Sözlerini Al
+  // 🎤 Lyrics
   const response = await fetch(`http://127.0.0.1:5000/lyrics?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
   const data = await response.json();
 
@@ -28,7 +49,6 @@ async function getLyrics() {
     data.lyrics.forEach((lineObj, index) => {
       const card = document.createElement("div");
       card.className = "lyrics-card";
-
       const html = `
         <div class="e-card">
           <div class="e-card-header">
@@ -51,3 +71,4 @@ async function getLyrics() {
     container.innerHTML += "<p>Şarkı bulunamadı veya çeviri başarısız oldu.</p>";
   }
 }
+
