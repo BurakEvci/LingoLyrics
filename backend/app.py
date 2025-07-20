@@ -14,6 +14,7 @@ genius.remove_section_headers = True
 app = Flask(__name__)
 CORS(app)
 
+
 @app.route('/lyrics', methods=['GET'])
 def get_lyrics():
     artist = request.args.get('artist')
@@ -26,10 +27,10 @@ def get_lyrics():
     if song:
         lines = clean_lyrics(song.lyrics)
         translated_lines = translate_multilang_lyrics(lines)
-
         return jsonify({"lyrics": translated_lines})
     else:
         return jsonify({"error": "Song not found"}), 404
+
 
 if __name__ == '__main__':
     app.run(debug=True)

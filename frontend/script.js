@@ -5,26 +5,23 @@ async function getLyrics() {
   const response = await fetch(`http://127.0.0.1:5000/lyrics?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
   const data = await response.json();
 
-  const lyricsDiv = document.getElementById("lyrics");
-  lyricsDiv.innerHTML = "";
+  const lyricsList = document.getElementById("lyrics");
+  lyricsList.innerHTML = "";
 
   if (data.lyrics) {
     data.lyrics.forEach((lineObj, index) => {
-      const lineBlock = document.createElement("div");
-      lineBlock.style.marginBottom = "15px";
-
-      lineBlock.innerHTML = `
+      const li = document.createElement("li");
+      li.innerHTML = `
         <p><strong>${index + 1}.</strong></p>
         <p><strong>Original:</strong> ${lineObj.original}</p>
         <p><strong>English:</strong> ${lineObj.en}</p>
         <p><strong>Türkçe:</strong> ${lineObj.tr}</p>
         <p><strong>Español:</strong> ${lineObj.es}</p>
-        <hr />
+        <hr/>
       `;
-
-      lyricsDiv.appendChild(lineBlock);
+      lyricsList.appendChild(li);
     });
   } else {
-    lyricsDiv.innerHTML = "<p>Şarkı bulunamadı.</p>";
+    lyricsList.innerHTML = "<li>Şarkı bulunamadı.</li>";
   }
 }

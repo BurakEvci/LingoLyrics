@@ -1,41 +1,52 @@
 import re
+import deepl
 from langdetect import detect, DetectorFactory
-from googletrans import Translator
+import os
+from dotenv import load_dotenv
 
 DetectorFactory.seed = 0
-translator = Translator()
+load_dotenv()
+DEEPL_API_KEY = os.getenv("DEEPL_API_KEY")
+translator = deepl.Translator(DEEPL_API_KEY)
 
 
 def detect_language(text):
     try:
-        return detect(text)
+        lang = detect(text)
+        if lang not in ["en", "tr", "es"]:  # DeepL için gerekli diller
+            return "en"  # varsayılan fallback
+        return lang
     except:
-        return "unknown"
+        return "en"
 
 
-def translate_line(text, source_lang, dest_lang):
+
+def translate_line_deepl(text, target_lang):
     try:
         if text.strip() == "":
             return ""
-        return translator.translate(text, src=source_lang, dest=dest_lang).text
-    except:
+        result = translator.translate_text(text, target_lang=target_lang.upper())
+        # Aynıysa, çevrilmemiştir → büyük ihtimalle zaten o dildeydi
+        if result.text.strip().lower() == text.strip().lower():
+            return text
+        return result.text
+    except Exception as e:
+        print(f"Çeviri hatası ({target_lang.upper()}):", e)
         return "[Çeviri başarısız]"
 
 
 def translate_multilang_lyrics(lines):
     result = []
     for line in lines:
-        lang = detect_language(line)
         try:
-            en = translate_line(line, lang, "en") if lang != "en" else line
-            tr = translate_line(line, lang, "tr") if lang != "tr" else line
-            es = translate_line(line, lang, "es") if lang != "es" else line
+            en = translate_line_deepl(line, "EN-US")
+            tr = translate_line_deepl(line, "TR")
+            es = translate_line_deepl(line, "ES")
         except:
-            en, tr, es = "[Çeviri başarısız]", "[Çeviri başarısız]", "[Çeviri başarısız]"
+            en = tr = es = "[Çeviri başarısız]"
 
         result.append({
             "original": line,
-            "lang": lang,
             "en": en,
             "tr": tr,
             "es": es
@@ -55,6 +66,6 @@ def clean_lyrics(raw_lyrics: str) -> list[str]:
         if "Lyrics" in line:
             continue
         if re.match(r"\(.*?\)", line):
-            continue  # Parantezli satırları atla
+            continue
         cleaned.append(line)
     return cleaned
