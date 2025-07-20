@@ -3,24 +3,26 @@ document.getElementById("getLyrics").addEventListener("click", getLyrics);
 async function getLyrics() {
   const artist = document.getElementById("artist").value;
   const title = document.getElementById("title").value;
-
-  const response = await fetch(`http://127.0.0.1:5000/lyrics?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
-  const data = await response.json();
-
   const container = document.getElementById("lyricsContainer");
   container.innerHTML = "";
 
-  // 🎧 Spotify butonunu göster
-  const spotifyBtn = document.createElement("button");
-  spotifyBtn.innerText = "🎧 Şarkıyı Spotify'da Dinle";
-  spotifyBtn.style.marginBottom = "20px";
-  spotifyBtn.onclick = async () => {
-    const res = await fetch(`http://127.0.0.1:5000/spotify?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
-    const json = await res.json();
-    if (json.url) window.open(json.url, '_blank');
-    else alert("Spotify şarkısı bulunamadı.");
-  };
-  container.appendChild(spotifyBtn);
+  // 🎵 Spotify Track ID Al
+  const spotifyRes = await fetch(`http://127.0.0.1:5000/spotify?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
+  const spotifyData = await spotifyRes.json();
+  if (spotifyData.track_id) {
+    const iframe = document.createElement("iframe");
+    iframe.src = `https://open.spotify.com/embed/track/${spotifyData.track_id}`;
+    iframe.width = "100%";
+    iframe.height = "80";
+    iframe.frameBorder = "0";
+    iframe.allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture";
+    iframe.allowFullscreen = true;
+    container.appendChild(iframe);
+  }
+
+  // 🎤 Şarkı Sözlerini Al
+  const response = await fetch(`http://127.0.0.1:5000/lyrics?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
+  const data = await response.json();
 
   if (data.lyrics && Array.isArray(data.lyrics)) {
     data.lyrics.forEach((lineObj, index) => {
@@ -36,9 +38,9 @@ async function getLyrics() {
             </div>
           </div>
           <div class="e-card-content">
-            <p style="color:blue;"><strong>🇬🇧 English:</strong> ${lineObj.en}</p>
-            <p style="color:black;"><strong>🇹🇷 Türkçe:</strong> ${lineObj.tr}</p>
-            <p style="color:red;"><strong>🇪🇸 Español:</strong> ${lineObj.es}</p>
+            <p style="color: blue;"><strong>🇬🇧 English:</strong> ${lineObj.en}</p>
+            <p style="color: black;"><strong>🇹🇷 Türkçe:</strong> ${lineObj.tr}</p>
+            <p style="color: red;"><strong>🇪🇸 Español:</strong> ${lineObj.es}</p>
           </div>
         </div>
       `;
