@@ -10,6 +10,18 @@ async function getLyrics() {
   const container = document.getElementById("lyricsContainer");
   container.innerHTML = "";
 
+  // 🎧 Spotify butonunu göster
+  const spotifyBtn = document.createElement("button");
+  spotifyBtn.innerText = "🎧 Şarkıyı Spotify'da Dinle";
+  spotifyBtn.style.marginBottom = "20px";
+  spotifyBtn.onclick = async () => {
+    const res = await fetch(`http://127.0.0.1:5000/spotify?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
+    const json = await res.json();
+    if (json.url) window.open(json.url, '_blank');
+    else alert("Spotify şarkısı bulunamadı.");
+  };
+  container.appendChild(spotifyBtn);
+
   if (data.lyrics && Array.isArray(data.lyrics)) {
     data.lyrics.forEach((lineObj, index) => {
       const card = document.createElement("div");
@@ -24,9 +36,9 @@ async function getLyrics() {
             </div>
           </div>
           <div class="e-card-content">
-            <p><strong>🇬🇧 English:</strong> ${lineObj.en}</p>
-            <p><strong>🇹🇷 Türkçe:</strong> ${lineObj.tr}</p>
-            <p><strong>🇪🇸 Español:</strong> ${lineObj.es}</p>
+            <p style="color:blue;"><strong>🇬🇧 English:</strong> ${lineObj.en}</p>
+            <p style="color:black;"><strong>🇹🇷 Türkçe:</strong> ${lineObj.tr}</p>
+            <p style="color:red;"><strong>🇪🇸 Español:</strong> ${lineObj.es}</p>
           </div>
         </div>
       `;
@@ -34,6 +46,6 @@ async function getLyrics() {
       container.appendChild(card);
     });
   } else {
-    container.innerHTML = "<p>Şarkı bulunamadı veya çeviri başarısız oldu.</p>";
+    container.innerHTML += "<p>Şarkı bulunamadı veya çeviri başarısız oldu.</p>";
   }
 }
