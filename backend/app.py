@@ -1,8 +1,11 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from dotenv import load_dotenv
+import os
 import lyricsgenius
 
-genius = lyricsgenius.Genius("TaHd4DAkJv3jsBfi3WQ8Ra1UkkNjJ1oJn5kgjvqfgOWS98Y-GG4iBS_Qe202j9a5")
+load_dotenv()
+genius = lyricsgenius.Genius("GENIUS_API_TOKEN")
 genius.skip_non_songs = True
 genius.excluded_terms = ["(Remix)", "(Live)"]
 genius.remove_section_headers = True
