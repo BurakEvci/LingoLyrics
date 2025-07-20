@@ -3,7 +3,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 import lyricsgenius
-from utils import clean_lyrics
+from utils import clean_lyrics, translate_multilang_lyrics
 
 load_dotenv()
 genius = lyricsgenius.Genius(os.getenv("GENIUS_API_TOKEN"))
@@ -13,8 +13,6 @@ genius.remove_section_headers = True
 
 app = Flask(__name__)
 CORS(app)
-
-
 
 @app.route('/lyrics', methods=['GET'])
 def get_lyrics():
@@ -26,8 +24,10 @@ def get_lyrics():
 
     song = genius.search_song(title, artist)
     if song:
-        cleaned_lines = clean_lyrics(song.lyrics)
-        return jsonify({"lyrics": cleaned_lines})
+        lines = clean_lyrics(song.lyrics)
+        translated_lines = translate_multilang_lyrics(lines)
+
+        return jsonify({"lyrics": translated_lines})
     else:
         return jsonify({"error": "Song not found"}), 404
 
