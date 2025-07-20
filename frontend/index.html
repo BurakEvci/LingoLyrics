@@ -3,15 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <title>LingoLyrics</title>
+  <!-- Syncfusion CSS -->
+  <link href="https://cdn.syncfusion.com/ej2/23.1.36/material.css" rel="stylesheet" />
+  <!-- Syncfusion JS -->
+  <script src="https://cdn.syncfusion.com/ej2/23.1.36/dist/ej2.min.js"></script>
+  <!-- Custom JS -->
+  <script defer src="script.js"></script>
+  <style>
+    body {
+      margin: 40px;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .lyrics-card {
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-  <h2>Şarkı Ara</h2>
-  <input type="text" id="artist" placeholder="Sanatçı">
-  <input type="text" id="title" placeholder="Şarkı Adı">
-  <button onclick="getLyrics()">Sözleri Getir</button>
+  <h1>LingoLyrics 🎵</h1>
 
-  <ul id="lyrics"></ul>
+  <div style="margin-bottom: 20px;">
+    <input id="artist" type="text" placeholder="Sanatçı" />
+    <input id="title" type="text" placeholder="Şarkı Adı" />
+    <button id="getLyrics">Sözleri Getir</button>
+  </div>
 
-  <script src="script.js"></script>
+  <div id="lyricsContainer"></div>
 </body>
 </html>
